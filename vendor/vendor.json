@@ -1,0 +1,31 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "+AzDJZ8Cr5DMUv3SBHrULyAlwjM=",
+			"path": "github.com/JustinBeckwith/go-yelp/yelp",
+			"revision": "2228f91f3d151c1cd01f8e916b5cc89741b6ac92",
+			"revisionTime": "2016-06-09T05:33:33Z"
+		},
+		{
+			"checksumSHA1": "s2lj8v8xs/DH4UTAALjxNIvuDpY=",
+			"path": "github.com/JustinBeckwith/oauth",
+			"revision": "a1577bd3870218dc30725a7cf4655e9917e3751b",
+			"revisionTime": "2015-01-15T05:46:24Z"
+		},
+		{
+			"checksumSHA1": "PCu52V+dvV/LxYAchFEGCeCvAdk=",
+			"path": "github.com/guregu/null",
+			"revision": "41961cea0328defc5f95c1c473f89ebf0d1813f6",
+			"revisionTime": "2016-02-28T00:53:16Z"
+		},
+		{
+			"checksumSHA1": "yTXzqjXZNZCx2XX1kQ1BDFagmuk=",
+			"path": "github.com/line/line-bot-sdk-go/linebot",
+			"revision": "8635ae812e60724b61ee9f0f9d9bf5c43a49f306",
+			"revisionTime": "2016-05-26T07:55:30Z"
+		}
+	],
+	"rootPath": "/testlinesteve"
+}
