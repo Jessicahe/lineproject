@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/JustinBeckwith/go-yelp/yelp"
+	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 var bot *linebot.Client
@@ -70,7 +70,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	for _, result := range received.Results {
 		content := result.Content()
 
-		if content != nil && content.IsOperation && content.OpType == 4{
+		if content != nil && content.IsOperation && content.OpType == 4 {
 			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi～\n歡迎加入 LINE Delicious！\n請輸入'食物 地區' 查詢想吃的美食\n例如:\n義大利麵 新北市新莊區")
 			//_, err = bot.SendSticker([]string{result.RawContent.Params[0]}, 11, 1, 100)
 			if err != nil {
@@ -83,16 +83,16 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			c := strings.Split(text.Text, " ")
 			// create a new yelp client with the auth keys
 			client := yelp.New(o, nil)
-			if len(c) == 2{
+			if len(c) == 2 {
 				// make a simple query
 				results, err := client.DoSimpleSearch(c[0], c[1])
 				if err != nil {
 					log.Println(err)
 				}
 
-				for i := 0; i <5; i++ {
+				for i := 0; i < 5; i++ {
 					imgurl := results.Businesses[i].ImageURL
-					address := strings.Join(results.Businesses[i].Location.DisplayAddress,",")
+					address := strings.Join(results.Businesses[i].Location.DisplayAddress, ",")
 					var largeImageURL = strings.Replace(results.Businesses[i].ImageURL, "ms.jpg", "l.jpg", 1)
 					_, err = bot.SendImage([]string{content.From}, results.Businesses[i].MobileURL, largeImageURL)
 					imgurl = "http://i.imgur.com/lVM92n5.jpg"
@@ -100,15 +100,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						SetAction("food", "food", results.Businesses[i].URL).
 						SetListener("food", 0, 0, 1040, 1040).
 						Send([]string{content.From}, imgurl, "imagURLtest")
-					
-					_, err = bot.SendText([]string{content.From}, "店名: " + results.Businesses[i].Name + "\n電話: " + results.Businesses[i].Phone + "\n評比: " + strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64))
+
+					_, err = bot.SendText([]string{content.From}, "店名: "+results.Businesses[i].Name+"\n電話: "+results.Businesses[i].Phone+"\n評比: "+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64))
 					_, err = bot.SendLocation([]string{content.From}, "地址: ", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 				}
-			}else{
+			} else {
 				_, err = bot.NewMultipleMessage().
-				AddText("輸入格式錯誤, 請確認").
-				//AddSticker(1, 1, 100).
-				Send([]string{content.From})
+					AddText("輸入格式錯誤, 請確認").
+					//AddSticker(1, 1, 100).
+					Send([]string{content.From})
 			}
 			if err != nil {
 				log.Println("OK")
