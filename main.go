@@ -19,6 +19,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"net/url"
+	"io/ioutil"
 
 	"github.com/JustinBeckwith/go-yelp/yelp"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -27,7 +29,55 @@ import (
 var bot *linebot.Client
 var richbot *linebot.RichMessageRequest
 var o *yelp.AuthOptions
+//shorten url
+const (
+	TINY_URL = 1
+	IS_GD    = 2
+)
 
+type UrlShortener struct {
+	ShortUrl    string
+	OriginalUrl string
+}
+
+func getResponseData(urlOrig string) string {
+	response, err := http.Get(urlOrig)
+	if err != nil {
+		fmt.Print(err)
+	}
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	return string(contents)
+}
+
+func tinyUrlShortener(urlOrig string) (string, string) {
+	escapedUrl := url.QueryEscape(urlOrig)
+	tinyUrl := fmt.Sprintf("http://tinyurl.com/api-create.php?url=%s", escapedUrl)
+	return getResponseData(tinyUrl), urlOrig
+}
+
+func isGdShortener(urlOrig string) (string, string) {
+	escapedUrl := url.QueryEscape(urlOrig)
+	isGdUrl := fmt.Sprintf("http://is.gd/create.php?url=%s&format=simple", escapedUrl)
+	return getResponseData(isGdUrl), urlOrig
+}
+
+func (u *UrlShortener) short(urlOrig string, shortener int) *UrlShortener {
+	switch shortener {
+	case TINY_URL:
+		shortUrl, originalUrl := tinyUrlShortener(urlOrig)
+		u.ShortUrl = shortUrl
+		u.OriginalUrl = originalUrl
+		return u
+	case IS_GD:
+		shortUrl, originalUrl := isGdShortener(urlOrig)
+		u.ShortUrl = shortUrl
+		u.OriginalUrl = originalUrl
+		return u
+	}
+	return u
+}
+//surl
 func main() {
 	strID := os.Getenv("ChannelID")
 	numID, err := strconv.ParseInt(strID, 10, 64)
@@ -71,7 +121,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 
 		if content != nil && content.IsOperation && content.OpType == 4 {
-			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi～\n歡迎加入 LINE Delicious！\n請輸入'食物 地區' 查詢想吃的美食\n例如:\n義大利麵 新北市新莊區")
+			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi～\n歡迎加入 LINE Delicious！\n請輸入'食物 地區' 查詢想吃的美食\n例如：\n義大利麵 新北市新莊區")
 			//_, err = bot.SendSticker([]string{result.RawContent.Params[0]}, 11, 1, 100)
 			if err != nil {
 				log.Println("New friend add event.")
@@ -90,19 +140,17 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Println(err)
 				}
 
-				for i := 0; i < 5; i++ {
-					imgurl := results.Businesses[i].ImageURL
+				for i := 0; i < 3; i++ {
+					weburl := results.Businesses[i].URL
+					urlOrig := UrlShortener{}
+					urlOrig.short(weburl, IS_GD)
 					address := strings.Join(results.Businesses[i].Location.DisplayAddress, ",")
 					var largeImageURL = strings.Replace(results.Businesses[i].ImageURL, "ms.jpg", "l.jpg", 1)
 					_, err = bot.SendImage([]string{content.From}, results.Businesses[i].MobileURL, largeImageURL)
-					imgurl = "http://i.imgur.com/lVM92n5.jpg"
-					bot.NewRichMessage(1040).
-						SetAction("food", "food", results.Businesses[i].URL).
-						SetListener("food", 0, 0, 1040, 1040).
-						Send([]string{content.From}, imgurl, "imagURLtest")
-
-					_, err = bot.SendText([]string{content.From}, "店名: "+results.Businesses[i].Name+"\n電話: "+results.Businesses[i].Phone+"\n評比: "+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64))
-					_, err = bot.SendLocation([]string{content.From}, "地址: ", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
+					_, err = bot.SendText([]string{content.From}, "店名："+results.Businesses[i].Name+"\n電話："+results.Businesses[i].Phone+"\n評比："+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64)+"\n更多資訊：\n" + urlOrig.ShortUrl)
+					//_, err = bot.SendLocation([]string{content.From}, results.Businesses[i].Name, address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
+					_, err = bot.SendLocation([]string{content.From},"地址：", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
+					//_, err = bot.SendText([]string{content.From}, "更多資訊: \n" + urlOrig.ShortUrl)
 				}
 			} else {
 				_, err = bot.NewMultipleMessage().
