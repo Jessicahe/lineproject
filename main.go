@@ -121,7 +121,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 
 		if content != nil && content.IsOperation && content.OpType == 4 {
-			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi～\n歡迎加入 LINE Delicious！\n請輸入'食物 地區' 查詢想吃的美食\n例如：\n義大利麵 新北市新莊區")
+			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi~\n歡迎加入 Delicious!\n如果想查詢附近或各地美食都可以LINE我呦！\n下列3種輸入方式：\n1.地區\nex：台北市信義區\n\n2.食物 地區\nex：義大利麵 新北市新莊區\n\n3.傳送位置訊息")
 			//_, err = bot.SendSticker([]string{result.RawContent.Params[0]}, 11, 1, 100)
 			if err != nil {
 				log.Println("New friend add event.")
@@ -148,21 +148,19 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					var largeImageURL = strings.Replace(results.Businesses[i].ImageURL, "ms.jpg", "l.jpg", 1)
 					_, err = bot.SendImage([]string{content.From}, results.Businesses[i].MobileURL, largeImageURL)
 					_, err = bot.SendText([]string{content.From}, "店名："+results.Businesses[i].Name+"\n電話："+results.Businesses[i].Phone+"\n評比："+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64)+"\n更多資訊：\n" + urlOrig.ShortUrl)
-					//_, err = bot.SendLocation([]string{content.From}, results.Businesses[i].Name, address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 					_, err = bot.SendLocation([]string{content.From},"地址：", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 					//_, err = bot.SendText([]string{content.From}, "更多資訊: \n" + urlOrig.ShortUrl)
 				}
 			} else {
 				_, err = bot.NewMultipleMessage().
-					AddText("輸入格式錯誤, 請確認").
+					AddText("輸入格式錯誤\n請重新輸入！").
 					//AddSticker(1, 1, 100).
 					Send([]string{content.From})
 			}
 			if err != nil {
 				log.Println("OK")
 			}
-
-			_, err = bot.SendText([]string{content.From}, "請輸入'食物 地區' 查詢想吃的美食\n例如:\n義大利麵 新北市新莊區")
+			//_, err = bot.SendText([]string{content.From}, "查無資料！\n\n請輸入：\n1.地區\nex：台北市信義區\n\n2.食物 地區\nex：義大利麵 新北市新莊區\n\n3.傳送位置訊息")
 			//_, err = bot.SendSticker([]string{content.From}, 11, 1, 100)
 			if err != nil {
 				log.Println("wait for new message")
