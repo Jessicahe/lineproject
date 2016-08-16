@@ -136,7 +136,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				// make a simple query
 				results, err := client.DoSimpleSearch(c[0], c[1])
 				if err != nil {
-					_, err = bot.SendText([]string{content.From}, "查無資料")
+					_, err = bot.SendText([]string{content.From}, "查無資料！\n\n請輸入：\n1.地區\nex：台北市信義區\n\n2.食物 地區\nex：義大利麵 新北市新莊區\n\n3.傳送位置訊息")
 					log.Println(err)
 				}
 
@@ -153,7 +153,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			} else {
 				_, err = bot.NewMultipleMessage().
-					AddText("輸入格式錯誤\n請重新輸入！").
+					AddText("輸入格式錯誤！\n\n請輸入：\n1.地區\nex：台北市信義區\n\n2.食物 地區\nex：義大利麵 新北市新莊區\n\n3.傳送位置訊息").
 					//AddSticker(1, 1, 100).
 					Send([]string{content.From})
 			}
