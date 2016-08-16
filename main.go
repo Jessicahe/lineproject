@@ -27,7 +27,6 @@ import (
 )
 
 var bot *linebot.Client
-var richbot *linebot.RichMessageRequest
 var o *yelp.AuthOptions
 //shorten url
 const (
