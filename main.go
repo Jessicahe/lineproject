@@ -90,7 +90,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		//identify different ContentType
 		if content != nil && content.IsOperation && content.OpType == 4 {
 			//add new friend
-			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi~\n歡迎加入 Delicious!\n如果想查詢附近或各地美食都可以LINE我呦！\n\n請輸入想查詢的食物種類\nex:義大利麵")
+			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi~\n歡迎加入 Delicious!\n\n想查詢附近或各地美食都可以LINE我呦！\n\n請問你想吃什麼?\nex:義大利麵")
 			if err != nil {
 				log.Println(err)
 			}
@@ -102,7 +102,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if food == "" {
-				_, err = bot.SendText([]string{content.From},"沒有輸入欲查詢的食物種類\n預設為所有食物、餐廳")
+				_, err = bot.SendText([]string{content.From},"沒有輸入欲查詢的食物種類\n預設為所有食物、餐廳\n請重新輸入\n\n請問你想吃什麼?\nex:義大利麵")
 				food = "food,restaurants"
 			}
 
@@ -122,7 +122,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			results, err := client.DoSearch(s)
 			if err != nil {
 				log.Println(err)
-				_, err = bot.SendText([]string{content.From}, "查無資料！\n請重新輸入\n\n請輸入想查詢的食物種類\nex:義大利麵")
+				_, err = bot.SendText([]string{content.From}, "查無資料！\n請重新輸入\n\n請問你想吃什麼?\nex:義大利麵")
 				food = ""
 			}
 
@@ -147,7 +147,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				_, err = bot.SendText([]string{content.From}, "店名："+results.Businesses[i].Name+"\n電話："+results.Businesses[i].Phone+"\n評比："+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64)+"\n更多資訊：" + urlOrig.ShortUrl)
 				_, err = bot.SendLocation([]string{content.From}, results.Businesses[i].Name+"\n", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 			}
-			_, err = bot.SendText([]string{content.From}, "請輸入想查詢的食物種類\nex:義大利麵")
+			_, err = bot.SendText([]string{content.From}, "請問你想吃什麼？\nex:義大利麵")
 			food = ""
 		} else if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
 			//receive text
@@ -158,7 +158,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 			if food == "" {
 				food = text.Text
-				_, err := bot.SendText([]string{content.From}, "請輸入或傳送想搜索的位置資訊\nex:台北市信義區...")
+				_, err := bot.SendText([]string{content.From}, "你在哪裡?\n(請輸入或傳送想搜索的位置資訊)\nex:台北市信義區...")
 				if err != nil {
 					log.Println(err)
 				}
@@ -169,7 +169,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				results, err := client.DoSimpleSearch(food, place)
 				if err != nil {
 					log.Println(err)
-					_, err = bot.SendText([]string{content.From}, "查無資料！\n請重新輸入\n\n請輸入想查詢的食物種類\nex:義大利麵")
+					_, err = bot.SendText([]string{content.From}, "查無資料！\n請重新輸入\n\n請問你想吃什麼?\nex:義大利麵")
 					food = ""
 				}
 
@@ -194,7 +194,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					_, err = bot.SendText([]string{content.From}, "店名："+results.Businesses[i].Name+"\n電話："+results.Businesses[i].Phone+"\n評比："+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64)+"\n更多資訊：" + urlOrig.ShortUrl)
 					_, err = bot.SendLocation([]string{content.From}, results.Businesses[i].Name+"\n", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 				}
-				_, err = bot.SendText([]string{content.From}, "請輸入想查詢的食物種類\nex:義大利麵")
+				_, err = bot.SendText([]string{content.From}, "請問你想吃什麼?\nex:義大利麵")
 				food = ""
 			}
 		}
