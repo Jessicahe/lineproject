@@ -137,6 +137,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				// make a simple query
 				results, err := client.DoSimpleSearch(c[0], c[1])
 				if err != nil {
+					_, err = bot.SendText([]string{content.From}, "查無資料")
 					log.Println(err)
 				}
 
