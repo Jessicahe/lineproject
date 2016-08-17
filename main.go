@@ -194,7 +194,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					_, err = bot.SendText([]string{content.From}, "店名："+results.Businesses[i].Name+"\n電話："+results.Businesses[i].Phone+"\n評比："+strconv.FormatFloat(float64(results.Businesses[i].Rating), 'f', 1, 64)+"\n更多資訊：" + urlOrig.ShortUrl)
 					_, err = bot.SendLocation([]string{content.From}, results.Businesses[i].Name+"\n", address, float64(results.Businesses[i].Location.Coordinate.Latitude), float64(results.Businesses[i].Location.Coordinate.Longitude))
 				}
-				_, err = bot.SendText([]string{content.From}, "請問你想吃什麼?\nex:義大利麵")
+				_, err = bot.SendText([]string{content.From}, "請問你還想吃什麼?\nex:義大利麵")
 				food = ""
 			}
 		}
