@@ -80,14 +80,19 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
 	// create a new yelp client with the auth keys
 	client := yelp.New(o, nil)
 
 	for _, result := range received.Results {
 		content := result.Content()
-
 		//identify different ContentType
+		if content != nil {
+            result, err := bot.GetUserProfile([]string{content.From})
+                if err != nil {
+                    return
+                }
+             log.Printf("profile: %v", result)
+         }
 		if content != nil && content.IsOperation && content.OpType == 4 {
 			//add new friend
 			_, err := bot.SendText([]string{result.RawContent.Params[0]}, "Hi~\n歡迎加入 Delicious!\n\n想查詢附近或各地美食都可以LINE我呦！\n\n請問你想吃什麼?\nex:義大利麵\n\n想不到吃什麼，也可以直接'傳送目前位置訊息'")
